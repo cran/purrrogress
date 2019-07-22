@@ -2,7 +2,7 @@
 #! Changes will be overwritten.
 
 context('tests extracted from file `progress_bar.R`')
-#line 48 "R/progress_bar.R"
+#line 54 "R/progress_bar.R"
 test_that('infer_type', {#@testing
     expect_equal(infer_type('Windows', TRUE), 'win')
     expect_equal(infer_type('Windows', FALSE), 'none')
@@ -10,7 +10,7 @@ test_that('infer_type', {#@testing
     expect_equal(infer_type('FooBar', TRUE), 'txt')
     expect_equal(infer_type('FooBar', FALSE), 'none')
 })
-#line 79 "R/progress_bar.R"
+#line 85 "R/progress_bar.R"
 test_that('resolve_type', {#@testing
     expect_identical(resolve_type('win'), R6_win_progress)
     expect_error(resolve_type('tk'))

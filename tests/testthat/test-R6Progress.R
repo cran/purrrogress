@@ -2,7 +2,7 @@
 #! Changes will be overwritten.
 
 context('tests extracted from file `R6Progress.R`')
-#line 147 "R/R6Progress.R"
+#line 150 "R/R6Progress.R"
 test_that('R6_progress', {#@testing
     test <- R6_progress$new(100)
 
@@ -61,20 +61,21 @@ test_that('R6_progress', {#@testing
 
 
 })
-#line 297 "R/R6Progress.R"
+#line 304 "R/R6Progress.R"
 test_that('R6_win_progress', {#@testing
     words <- stringi::stri_rand_lipsum(1, FALSE) %>%
              stringi::stri_split(fixed = ' ') %>%
              unlist()
 
+    i <- 1
     pb <-
         R6_win_progress$new( length(words)
                            , "Test Progress {current}/{total} ({estimated.time.remaining} remaining.)"
                            , "{elapsed.time}/{estimated.total.time} estimated.\n {word}"
                            , width = 600
                            , bindings = list(word = ~words[i])
+                           , show.after=2
                            )
-    i <- 1
 
     expect_identical(pb$total, length(words))
     expect_identical(pb$current, 0L)

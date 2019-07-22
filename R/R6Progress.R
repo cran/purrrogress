@@ -1,6 +1,5 @@
 #' @import pkgcond
 #' @importFrom assertthat is.flag is.string is.count is.number
-#' @importFrom hms as.hms round_hms
 #' @importFrom glue glue
 #' @importFrom testextra are
 NULL
@@ -52,8 +51,10 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
             }
         },
         init = function(){
-            private$.start.time. <- proc.time()
-            private$.initialized. <- TRUE
+            if(!private$.initialized.){
+                private$.start.time. <- proc.time()
+                private$.initialized. <- TRUE
+            }
             invisible(self)
         },
         term = function(){invisible(NULL)},
@@ -107,21 +108,23 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
         current = function(){private$.current.},
         frac = function(){paste0(private$.current., '/', private$.total.)},
         elapsed.time=function(){
-            (proc.time() - private$.start.time.)['elapsed'] %>% hms::as.hms() %>%
+            (proc.time() - private$.start.time.)['elapsed'] %>%
+                as.numeric() %>%
+                hms::as_hms() %>%
                 hms::round_hms(1)
         },
         average.time = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            ((proc.time() - private$.start.time.)['elapsed']/private$.current.) %>%
-                hms::as.hms() %>% hms::round_hms(1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            as.numeric((proc.time() - private$.start.time.)['elapsed']/private$.current.) %>%
+                hms::as_hms() %>% hms::round_hms(1)
         },
         estimated.total.time = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            round_hms(as.hms((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.), 1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            hms::round_hms(hms::as_hms(as.numeric((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.)), 1)
         },
         estimated.time.remaining = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            round_hms(as.hms(self$estimated.total.time - self$elapsed.time), 1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            hms::round_hms(hms::as_hms(as.numeric(self$estimated.total.time - self$elapsed.time)), 1)
         },
         etr = function(){self$estimated.time.remaining},
         percent = function(){sprintf("%d%%", floor(private$.current./private$.total.*100))}
@@ -214,7 +217,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                              , label.final = "Finalizing"
                              , initial = 0L
                              , width = 500L
-                             , show.after = 1 # Number of seconds to pass before showing progress bar.
+                             , show.after = 0 # Number of seconds to pass before showing progress bar.
                              , min.time = show.after * 5 # Show only if expected time (in seconds) is greater than max.time.
                              , ...
                              ){
@@ -240,6 +243,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                 assert_that(is.string(label))
                 self$.label. <<- label
             }
+            self$show()
             if (!is.null(private$.pb.))
                 if (private$.current. < private$.total.) {
                     utils::setWinProgressBar( pb = private$.pb.
@@ -258,6 +262,15 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
         },
         init = function(){
             super$init()
+            self$show()
+            return(invisible(self))
+        },
+        term = function(){
+            if(!is.null(private$.pb.)) close(private$.pb.)
+            private$.pb. <- NULL
+            invisible(NULL)
+        },
+        show = function(){
             if ( is.null(private$.pb.)
                & self$elapsed.time >= private$.min.time.needed.to.show.
                & ( is.na(self$estimated.total.time)
@@ -272,12 +285,6 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                                          , initial = private$.current.
                                          , width = private$.width.
                                          )
-            return(invisible(self))
-        },
-        term = function(){
-            if(!is.null(private$.pb.)) close(private$.pb.)
-            private$.pb. <- NULL
-            invisible(NULL)
         }
         # nocov end
     ),
@@ -299,14 +306,15 @@ if(FALSE){#@testing
              stringi::stri_split(fixed = ' ') %>%
              unlist()
 
+    i <- 1
     pb <-
         R6_win_progress$new( length(words)
                            , "Test Progress {current}/{total} ({estimated.time.remaining} remaining.)"
                            , "{elapsed.time}/{estimated.total.time} estimated.\n {word}"
                            , width = 600
                            , bindings = list(word = ~words[i])
+                           , show.after=2
                            )
-    i <- 1
 
     expect_identical(pb$total, length(words))
     expect_identical(pb$current, 0L)

@@ -1,6 +1,6 @@
 Package: purrrogress
 Title: Add Progress Bars to Mapping Functions
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Andrew",
            family = "Redd",
@@ -21,8 +21,8 @@ Enhances: dplyr
 URL: https://github.com/halpo/purrrogress
 BugReports: https://github.com/halpo/purrrogress/issues
 NeedsCompilation: no
-Packaged: 2019-06-03 19:29:25 UTC; u0092104
+Packaged: 2019-07-22 18:22:25 UTC; u0092104
 Author: Andrew Redd [aut, cre] (<https://orcid.org/0000-0002-6149-2438>)
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Repository: CRAN
-Date/Publication: 2019-06-04 12:30:03 UTC
+Date/Publication: 2019-07-22 21:10:08 UTC

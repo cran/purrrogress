@@ -2,7 +2,13 @@
 #! Changes will be overwritten.
 
 context('tests extracted from file `purrr.R`')
-#line 23 "C:/Users/u0092104/Box Sync/Projects/Personal/purrrogress/R/purrr.R"
+#line 31 "R/purrr.R"
+test_that('all_calls', {#@testing
+    fun <- purrr::imap
+    expect_equal( sort(all_calls(fun))
+                , c("`<-`", 'as_mapper', 'map2', 'vec_index'))
+})
+#line 82 "R/purrr.R"
 test_that('is_purrr_map_call', {#@testing
     vals <- purrr::map_lgl(1:2, function(x)
         is_purrr_map_call(sys.call(sys.parent(1)))
@@ -14,7 +20,7 @@ test_that('is_purrr_map_call', {#@testing
     )
     expect_false(any(v2))
 })
-#line 40 "C:/Users/u0092104/Box Sync/Projects/Personal/purrrogress/R/purrr.R"
+#line 99 "R/purrr.R"
 test_that('is_purrr_frame', {#@testing
     vals <- purrr::map_lgl(1:2, function(x)
         is_purrr_frame(sys.frame(sys.parent(1)))
@@ -26,7 +32,7 @@ test_that('is_purrr_frame', {#@testing
     )
     expect_false(any(v2))
 })
-#line 65 "C:/Users/u0092104/Box Sync/Projects/Personal/purrrogress/R/purrr.R"
+#line 124 "R/purrr.R"
 test_that('in_purrr_map', {#@testing
     vals <- purrr::map_lgl(1:1, function(x){
         # which <- sys.parent(1):sys.nframe()
@@ -42,7 +48,7 @@ test_that('in_purrr_map', {#@testing
     )
     expect_false(any(v2))
 })
-#line 80 "C:/Users/u0092104/Box Sync/Projects/Personal/purrrogress/R/purrr.R"
+#line 139 "R/purrr.R"
 test_that('in_purrr_map nested.', {#@testing in_purrr_map nested.
     purrr::map(1:1, function(x){
         parent <- sys.parent()
@@ -55,7 +61,7 @@ test_that('in_purrr_map nested.', {#@testing in_purrr_map nested.
         expect_equal(me.val, parent)
     })
 })
-#line 121 "C:/Users/u0092104/Box Sync/Projects/Personal/purrrogress/R/purrr.R"
+#line 192 "R/purrr.R"
 test_that('with_purrr_progress', {#@testing
     purrr::map_lgl(1:5, with_progress(test_progress_status, type='none')
                   , 5
@@ -74,4 +80,10 @@ test_that('with_purrr_progress', {#@testing
                   , "this will take forever"
                   , class = "R6 Progress Base Class"
                   )
+
+    purrr::pmap_lgl(list(1:5), with_progress( test_progress_status, type='none'
+                                            , title = "pmap progress"
+                                            )
+                   , total = 5
+                   )
 })
